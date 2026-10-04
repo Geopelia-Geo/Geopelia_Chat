@@ -1,5 +1,15 @@
 # 🕊️ Geopelia_Chat — 把大结局的感动，做成一个 AI 聊天
-
+<p align="center">
+  <a href="https://github.com/Geopelia-Geo/Geopelia_Chat"><img alt="GitHub Repo" src="https://img.shields.io/badge/GitHub-Geopelia__Chat-ff69b4?logo=github"></a>
+  <a href="https://github.com/Geopelia-Geo/Geopelia_Chat/blob/main/LICENSE"><img alt="License" src="https://img.shields.io/github/license/Geopelia-Geo/Geopelia_Chat?color=blue"></a>
+  <a href="https://github.com/Geopelia-Geo/Geopelia_Chat/stargazers"><img alt="Stars" src="https://img.shields.io/github/stars/Geopelia-Geo/Geopelia_Chat?color=yellow"></a>
+  <a href="https://github.com/Geopelia-Geo/Geopelia_Chat/network/members"><img alt="Forks" src="https://img.shields.io/github/forks/Geopelia-Geo/Geopelia_Chat?color=orange"></a>
+  <a href="https://github.com/Geopelia-Geo/Geopelia_Chat/releases"><img alt="Release" src="https://img.shields.io/github/v/release/Geopelia-Geo/Geopelia_Chat?color=green"></a>
+  <a href="https://github.com/Geopelia-Geo/Geopelia_Chat"><img alt="Last Commit" src="https://img.shields.io/github/last-commit/Geopelia-Geo/Geopelia_Chat?color=green"></a>
+  <a href="https://developer.android.com/"><img alt="Android" src="https://img.shields.io/badge/Android-5.0+-3DDC84?logo=android&logoColor=white"></a>
+  <a href="https://www.java.com/"><img alt="Java" src="https://img.shields.io/badge/Java-Pure-007396?logo=openjdk&logoColor=white"></a>
+  <a href="https://www.deepseek.com/"><img alt="DeepSeek" src="https://img.shields.io/badge/API-DeepSeek-4D6BFE?logo=openai&logoColor=white"></a>
+</p>
 > **⚠️ 免责声明：本项目仅供学习交流使用，请勿用于商业用途。禁止倒卖！**
 
 玩完 Phigros 大结局之后，感动得不行。
