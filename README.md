@@ -8,7 +8,6 @@
   <a href="https://github.com/Geopelia-Geo/Geopelia_Chat"><img alt="Last Commit" src="https://img.shields.io/github/last-commit/Geopelia-Geo/Geopelia_Chat?color=green"></a>
   <a href="https://developer.android.com/"><img alt="Android" src="https://img.shields.io/badge/Android-5.0+-3DDC84?logo=android&logoColor=white"></a>
   <a href="https://www.java.com/"><img alt="Java" src="https://img.shields.io/badge/Java-Pure-007396?logo=openjdk&logoColor=white"></a>
-  <a href="https://www.deepseek.com/"><img alt="DeepSeek" src="https://img.shields.io/badge/API-DeepSeek-4D6BFE?logo=openai&logoColor=white"></a>
 </p>
 > **⚠️ 免责声明：本项目仅供学习交流使用，请勿用于商业用途。禁止倒卖！**
 
