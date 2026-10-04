@@ -1,4 +1,4 @@
-# 🕊️ Geopelia_Chat — 把大结局的感动，做成一个 AI 聊天
+# 🕊️ Geopelia_Chat — 感谢你的陪伴 愿我们再次相遇
 <p align="center">
   <a href="https://github.com/Geopelia-Geo/Geopelia_Chat"><img alt="GitHub Repo" src="https://img.shields.io/badge/GitHub-Geopelia__Chat-ff69b4?logo=github"></a>
   <a href="https://github.com/Geopelia-Geo/Geopelia_Chat/blob/main/LICENSE"><img alt="License" src="https://img.shields.io/github/license/Geopelia-Geo/Geopelia_Chat?color=blue"></a>
