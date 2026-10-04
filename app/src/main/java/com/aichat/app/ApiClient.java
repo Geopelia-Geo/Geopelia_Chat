@@ -17,7 +17,9 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.net.ssl.HttpsURLConnection;
 import javax.net.ssl.SSLContext;
@@ -27,17 +29,53 @@ import javax.net.ssl.X509TrustManager;
 
 public class ApiClient {
 
-    
-    private static final String[] PINNED_SPKI_HASHES = {
-            "KslVCVLNj5t/e67M06FA5NSudsCnIaTlIxl19lKhqDY=",  // api.deepseek.com 叶证书
-            "eLVG2Nq6lNlY482AlhlwwHqvL3TsvXMFJx2ycA8gZpQ="   // TrustAsia DV TLS RSA CA 2025
+    public static final String[] PROVIDERS = {
+            "deepseek", "tongyi", "zhipu", "kimi", "doubao", "groq", "anthropic", "other"
     };
 
-    private static volatile SSLContext pinnedContext; // 懒加载缓存
+    public static final String[] PROVIDER_NAMES = {
+            "DeepSeek", "通义千问", "智谱清言", "Kimi", "豆包(火山引擎)", "Groq", "Anthropic", "其他(仅HTTPS)"
+    };
+
+    private static final Map<String, String[]> PIN_MAP = new HashMap<>();
+
+    static {
+        PIN_MAP.put("deepseek", new String[]{
+                "KslVCVLNj5t/e67M06FA5NSudsCnIaTlIxl19lKhqDY=",
+                "eLVG2Nq6lNlY482AlhlwwHqvL3TsvXMFJx2ycA8gZpQ="
+        });
+        PIN_MAP.put("tongyi", new String[]{
+                "WZVJFj4+3elgfAAI/zW+L9mKCgh+6gck7f6zYoUC0Yg=",
+                "nZ4QsWxivBcuuFkI8dXgfa0Pb2o1sjZ8hKx6h+729xw="
+        });
+        PIN_MAP.put("zhipu", new String[]{
+                "efpviN4CHX6YeOqbLWsBTvnJqjULfZE/j9OAUrm/qH0=",
+                "X4AGLwdqSLcL//rYNWWFtfT1CnCt94N7jSHB6cabFBU="
+        });
+        PIN_MAP.put("kimi", new String[]{
+                "kxpiB7utdmL6V1bldpRAPJ8VLFeg4KIcMGm5c/Dy19c=",
+                "E3tYcwo9CiqATmKtpMLW5V+pzIq+ZoDmpXSiJlXGmTo="
+        });
+        PIN_MAP.put("doubao", new String[]{
+                "+03hVORN71gtdlp2tS7cTQ7+eFDH5a04h6/ocAF8k0c=",
+                "E3tYcwo9CiqATmKtpMLW5V+pzIq+ZoDmpXSiJlXGmTo="
+        });
+        PIN_MAP.put("groq", new String[]{
+                "i/Hiu2xyyGkPJRNjaeu1PZ46XYes2Dx4EbJd+HD06gw=",
+                "kIdp6NNEd8wsugYyyIYFsi1ylMCED3hZbSR8ZFsa/A4="
+        });
+        PIN_MAP.put("anthropic", new String[]{
+                "n+OFHb16YVI8KEux43Lk4jjFsK76xLolavlcACQEXq4=",
+                "kIdp6NNEd8wsugYyyIYFsi1ylMCED3hZbSR8ZFsa/A4="
+        });
+    }
+
+    private static final Map<String, SSLContext> contextCache = new HashMap<>();
 
     public static String chat(String baseUrl, String apiKey, String model,
                               String systemPrompt, double temperature, int maxTokens,
-                              List<Message> history) throws Exception {
+                              List<Message> history, boolean enablePinning, String provider)
+            throws Exception {
 
         baseUrl = baseUrl.trim();
         while (baseUrl.endsWith("/")) {
@@ -69,8 +107,10 @@ public class ApiClient {
 
         HttpURLConnection conn = (HttpURLConnection) new URL(endpoint).openConnection();
         try {
-            if (endpoint.toLowerCase().startsWith("https://") && isDeepSeekHost(endpoint)) {
-                SSLContext sc = getPinnedContext();
+            if (enablePinning && provider != null && !"other".equals(provider)
+                    && PIN_MAP.containsKey(provider)
+                    && endpoint.toLowerCase().startsWith("https://")) {
+                SSLContext sc = getPinnedContext(provider);
                 if (conn instanceof HttpsURLConnection) {
                     ((HttpsURLConnection) conn).setSSLSocketFactory(sc.getSocketFactory());
                 }
@@ -142,17 +182,6 @@ public class ApiClient {
         }
     }
 
-    
-    private static boolean isDeepSeekHost(String url) {
-        try {
-            String host = new URL(url).getHost().toLowerCase();
-            return host.equals("api.deepseek.com") || host.endsWith(".deepseek.com");
-        } catch (Exception e) {
-            return false;
-        }
-    }
-
-    
     private static boolean isPrivateHost(String url) {
         try {
             String host = new URL(url).getHost().toLowerCase();
@@ -164,25 +193,22 @@ public class ApiClient {
         }
     }
 
-    private static SSLContext getPinnedContext() throws Exception {
-        SSLContext sc = pinnedContext;
-        if (sc == null) {
-            synchronized (ApiClient.class) {
-                sc = pinnedContext;
-                if (sc == null) {
-                    sc = buildPinnedContext();
-                    pinnedContext = sc;
-                }
+    private static SSLContext getPinnedContext(String provider) throws Exception {
+        synchronized (contextCache) {
+            SSLContext sc = contextCache.get(provider);
+            if (sc == null) {
+                sc = buildPinnedContext(PIN_MAP.get(provider));
+                contextCache.put(provider, sc);
             }
+            return sc;
         }
-        return sc;
     }
 
-    private static SSLContext buildPinnedContext() throws Exception {
+    private static SSLContext buildPinnedContext(final String[] hashes) throws Exception {
         TrustManagerFactory tmf = TrustManagerFactory.getInstance(
                 TrustManagerFactory.getDefaultAlgorithm());
         tmf.init((KeyStore) null);
-        X509TrustManager systemTm = (X509TrustManager) tmf.getTrustManagers()[0];
+        final X509TrustManager systemTm = (X509TrustManager) tmf.getTrustManagers()[0];
 
         X509TrustManager pinTm = new X509TrustManager() {
             @Override
@@ -206,15 +232,15 @@ public class ApiClient {
                     for (X509Certificate cert : chain) {
                         byte[] spki = cert.getPublicKey().getEncoded();
                         String fp = Base64.encodeToString(md.digest(spki), Base64.NO_WRAP);
-                        for (String pin : PINNED_SPKI_HASHES) {
-                            if (pin.equals(fp)) return; // 命中即通过
+                        for (String pin : hashes) {
+                            if (pin.equals(fp)) return;
                         }
                     }
                 } catch (NoSuchAlgorithmException e) {
                     throw new CertificateException(e);
                 }
                 throw new CertificateException(
-                        "证书指纹校验失败：连接可能被中间人拦截，或 DeepSeek 证书已更换");
+                        "证书指纹校验失败：连接可能被中间人拦截，或所选服务商证书已更换");
             }
 
             @Override

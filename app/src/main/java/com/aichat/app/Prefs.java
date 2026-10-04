@@ -22,6 +22,8 @@ public class Prefs {
     public static final String KEY_BG_PATH  = "background_path";
     public static final String KEY_AVATAR_PATH = "avatar_path";
     public static final String KEY_NAME = "display_name";
+    public static final String KEY_ENABLE_PINNING = "enable_pinning";
+    public static final String KEY_PROVIDER = "provider";
 
     private final SharedPreferences sp;
 
@@ -78,6 +80,22 @@ public class Prefs {
 
     public void setDisplayName(String name) {
         sp.edit().putString(KEY_NAME, name == null ? "" : name).apply();
+    }
+
+    public boolean getEnablePinning() {
+        return sp.getBoolean(KEY_ENABLE_PINNING, true);
+    }
+
+    public void setEnablePinning(boolean v) {
+        sp.edit().putBoolean(KEY_ENABLE_PINNING, v).apply();
+    }
+
+    public String getProvider() {
+        return sp.getString(KEY_PROVIDER, "deepseek");
+    }
+
+    public void setProvider(String p) {
+        sp.edit().putString(KEY_PROVIDER, p == null ? "deepseek" : p).apply();
     }
 
     public void save(String baseUrl, String apiKey, String model,

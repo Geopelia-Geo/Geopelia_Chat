@@ -40,6 +40,8 @@ public class SettingsActivity extends AppCompatActivity {
     private static final int REQUEST_EXPORT_PERMISSION = 1004;
 
     private EditText etName, etBaseUrl, etApiKey, etModel, etTemperature, etMaxTokens, etContextCount;
+    private com.google.android.material.switchmaterial.SwitchMaterial swPinning;
+    private android.widget.Spinner spinnerProvider;
     private Prefs prefs;
     
     private String pendingExport = null;
@@ -73,6 +75,22 @@ public class SettingsActivity extends AppCompatActivity {
         android.widget.TextView tvOpenSource = findViewById(R.id.tvOpenSource);
         android.widget.TextView tvContact = findViewById(R.id.tvContact);
         android.widget.TextView tvVersion = findViewById(R.id.tvVersion);
+        com.google.android.material.switchmaterial.SwitchMaterial swPinning = findViewById(R.id.swPinning);
+        android.widget.Spinner spinnerProvider = findViewById(R.id.spinnerProvider);
+        this.swPinning = swPinning;
+        this.spinnerProvider = spinnerProvider;
+
+        android.widget.ArrayAdapter<String> providerAdapter = new android.widget.ArrayAdapter<>(
+                this, android.R.layout.simple_spinner_item, ApiClient.PROVIDER_NAMES);
+        providerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        spinnerProvider.setAdapter(providerAdapter);
+        String savedProvider = prefs.getProvider();
+        int pos = 0;
+        for (int i = 0; i < ApiClient.PROVIDERS.length; i++) {
+            if (ApiClient.PROVIDERS[i].equals(savedProvider)) { pos = i; break; }
+        }
+        spinnerProvider.setSelection(pos);
+        swPinning.setChecked(prefs.getEnablePinning());
 
         try {
             String ver = getPackageManager().getPackageInfo(getPackageName(), 0).versionName;
@@ -144,6 +162,11 @@ public class SettingsActivity extends AppCompatActivity {
 
         prefs.setDisplayName(name);
         prefs.save(baseUrl, apiKey, model, temp, maxTokens, contextCount);
+        prefs.setEnablePinning(swPinning.isChecked());
+        int p = spinnerProvider.getSelectedItemPosition();
+        if (p >= 0 && p < ApiClient.PROVIDERS.length) {
+            prefs.setProvider(ApiClient.PROVIDERS[p]);
+        }
         Toast.makeText(this, "设置已保存", Toast.LENGTH_SHORT).show();
         finish();
     }

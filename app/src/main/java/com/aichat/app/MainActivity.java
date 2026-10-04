@@ -271,7 +271,8 @@ public class MainActivity extends AppCompatActivity {
 
         new Thread(() -> {
             try {
-                final String reply = ApiClient.chat(baseUrl, apiKey, model, systemPrompt, temp, maxTok, recent);
+                final String reply = ApiClient.chat(baseUrl, apiKey, model, systemPrompt, temp, maxTok, recent,
+                        prefs.getEnablePinning(), prefs.getProvider());
                 final List<String> parts = splitParts(reply);
                 try {
                     Thread.sleep(typingDelay(reply.length()));
