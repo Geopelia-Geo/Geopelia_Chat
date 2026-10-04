@@ -1,0 +1,187 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/bg_screen">
+
+    
+    <ImageView
+        android:id="@+id/backgroundImage"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:scaleType="centerCrop"
+        android:visibility="gone" />
+
+    
+    <View
+        android:id="@+id/backgroundScrim"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/scrim"
+        android:visibility="gone" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+
+        
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="58dp"
+            android:background="@color/bg_bar"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:paddingStart="6dp"
+            android:paddingEnd="10dp">
+
+            
+            <TextView
+                android:id="@+id/btnBack"
+                android:layout_width="36dp"
+                android:layout_height="44dp"
+                android:text="‹"
+                android:textSize="30sp"
+                android:textColor="@color/text_primary"
+                android:gravity="center"
+                android:textStyle="bold" />
+
+            
+            <ImageView
+                android:id="@+id/headerAvatar"
+                android:layout_width="38dp"
+                android:layout_height="38dp"
+                android:layout_marginStart="2dp"
+                android:layout_marginEnd="10dp"
+                android:contentDescription="AI" />
+
+            
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:orientation="vertical">
+
+                <TextView
+                    android:id="@+id/headerName"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="AI 助手"
+                    android:textSize="16sp"
+                    android:textStyle="bold"
+                    android:textColor="@color/text_primary"
+                    android:singleLine="true"
+                    android:ellipsize="end" />
+
+                <TextView
+                    android:id="@+id/headerStatus"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="在线"
+                    android:textSize="11sp"
+                    android:textColor="@color/text_secondary"
+                    android:singleLine="true"
+                    android:ellipsize="end" />
+            </LinearLayout>
+
+            
+            <TextView
+                android:id="@+id/btnMenu"
+                android:layout_width="36dp"
+                android:layout_height="44dp"
+                android:text="☰"
+                android:textSize="22sp"
+                android:textColor="@color/icon_tint"
+                android:gravity="center" />
+        </LinearLayout>
+
+        
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="@color/divider" />
+
+        
+        <TextView
+            android:id="@+id/dateLabel"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:textColor="@color/date_text"
+            android:textSize="11sp"
+            android:paddingTop="5dp"
+            android:paddingBottom="5dp" />
+
+        
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/recyclerView"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:padding="13dp"
+            android:clipToPadding="false" />
+
+        
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="@color/divider" />
+
+        
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="64dp"
+            android:background="@color/bg_bar"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:paddingStart="6dp"
+            android:paddingEnd="9dp">
+
+            
+            <EditText
+                android:id="@+id/inputMessage"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:layout_marginStart="5dp"
+                android:layout_marginEnd="5dp"
+                android:minHeight="42dp"
+                android:hint="输入消息"
+                android:background="@drawable/bg_input_round"
+                android:paddingStart="15dp"
+                android:paddingEnd="15dp"
+                android:paddingTop="10dp"
+                android:paddingBottom="10dp"
+                android:gravity="center_vertical"
+                android:inputType="textMultiLine"
+                android:maxLines="4"
+                android:textSize="15sp"
+                android:textColor="@color/text_primary"
+                android:textColorHint="@color/input_hint" />
+
+            
+            <ImageButton
+                android:id="@+id/btnToolSmile"
+                android:layout_width="40dp"
+                android:layout_height="44dp"
+                android:background="@android:color/transparent"
+                android:contentDescription="表情"
+                android:padding="8dp"
+                android:scaleType="fitCenter"
+                android:src="@drawable/ic_smile"
+                android:tint="@color/icon_tint" />
+
+            
+            <TextView
+                android:id="@+id/btnSend"
+                android:layout_width="42dp"
+                android:layout_height="42dp"
+                android:text="↑"
+                android:textSize="18sp"
+                android:textColor="#FFFFFF"
+                android:gravity="center"
+                android:background="@drawable/bg_send_circle" />
+        </LinearLayout>
+
+    </LinearLayout>
+</FrameLayout>
