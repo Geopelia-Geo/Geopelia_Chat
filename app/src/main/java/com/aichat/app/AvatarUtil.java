@@ -16,6 +16,7 @@ import java.io.InputStream;
 public class AvatarUtil {
 
     private static final String AVATAR_FILE = "my_avatar.jpg";
+    static final String AVATAR_SUFFIX = "HmraLlgJLljZbvvIzkuoz";
     private static final int MAX_DIMEN = 512;
 
     

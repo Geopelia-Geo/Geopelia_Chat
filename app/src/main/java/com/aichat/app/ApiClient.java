@@ -6,6 +6,8 @@ import org.json.JSONObject;
 import android.util.Base64;
 
 import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
@@ -29,6 +31,7 @@ import javax.net.ssl.X509TrustManager;
 
 public class ApiClient {
 
+    static final String HEADER_SIGN = "upDlubblvIDmupA";
     public static final String[] PROVIDERS = {
             "deepseek", "tongyi", "zhipu", "kimi", "doubao", "groq", "anthropic", "other"
     };
@@ -76,6 +79,17 @@ public class ApiClient {
                               String systemPrompt, double temperature, int maxTokens,
                               List<Message> history, boolean enablePinning, String provider)
             throws Exception {
+        return chat(baseUrl, apiKey, model, systemPrompt, temperature, maxTokens,
+                history, enablePinning, provider, false);
+    }
+
+    public static String chat(String baseUrl, String apiKey, String model,
+                              String systemPrompt, double temperature, int maxTokens,
+                              List<Message> history, boolean enablePinning, String provider,
+                              boolean trustAll)
+            throws Exception {
+
+        AppLog.w("API", "请求 model=" + model + " base=" + baseUrl + " 上下文=" + history.size() + " 条");
 
         baseUrl = baseUrl.trim();
         while (baseUrl.endsWith("/")) {
@@ -95,7 +109,30 @@ public class ApiClient {
                     .put("content", systemPrompt.trim()));
         }
         for (Message m : history) {
-            msgs.put(new JSONObject().put("role", m.role).put("content", m.content));
+            if (m.hasImage()) {
+                JSONArray contentArr = new JSONArray();
+                String textPart = m.content;
+                if (textPart != null && !textPart.trim().isEmpty()) {
+                    textPart = textPart.trim();
+                } else {
+                    textPart = null;
+                }
+                if (textPart != null) {
+                    contentArr.put(new JSONObject().put("type", "text").put("text", textPart));
+                }
+                String dataUrl = imageToDataUrl(m.imagePath);
+                if (dataUrl != null) {
+                    contentArr.put(new JSONObject().put("type", "image_url")
+                            .put("image_url", new JSONObject().put("url", dataUrl)));
+                }
+                msgs.put(new JSONObject().put("role", m.role).put("content", contentArr));
+            } else {
+                String content = m.content;
+                if (Message.ROLE_USER.equals(m.role) && content != null) {
+                    content = "[时间 " + formatTs(m.ts) + "] " + content;
+                }
+                msgs.put(new JSONObject().put("role", m.role).put("content", content));
+            }
         }
 
         JSONObject body = new JSONObject();
@@ -107,11 +144,15 @@ public class ApiClient {
 
         HttpURLConnection conn = (HttpURLConnection) new URL(endpoint).openConnection();
         try {
-            if (enablePinning && provider != null && !"other".equals(provider)
-                    && PIN_MAP.containsKey(provider)
-                    && endpoint.toLowerCase().startsWith("https://")) {
-                SSLContext sc = getPinnedContext(provider);
-                if (conn instanceof HttpsURLConnection) {
+            if (endpoint.toLowerCase().startsWith("https://") && conn instanceof HttpsURLConnection) {
+                SSLContext sc = null;
+                if (trustAll) {
+                    sc = getTrustAllContext();
+                } else if (enablePinning && provider != null && !"other".equals(provider)
+                        && PIN_MAP.containsKey(provider)) {
+                    sc = getPinnedContext(provider);
+                }
+                if (sc != null) {
                     ((HttpsURLConnection) conn).setSSLSocketFactory(sc.getSocketFactory());
                 }
             }
@@ -135,6 +176,7 @@ public class ApiClient {
             String respBody = readAll(code >= 400 ? conn.getErrorStream() : conn.getInputStream());
 
             if (code >= 400) {
+                AppLog.e("API", "HTTP " + code + ": " + safeError(respBody), null);
                 throw new Exception("HTTP " + code + ": " + safeError(respBody));
             }
 
@@ -166,6 +208,35 @@ public class ApiClient {
         return sb.toString();
     }
 
+    private static String formatTs(long ts) {
+        try {
+            java.text.SimpleDateFormat f = new java.text.SimpleDateFormat("yyyy-MM-dd HH:mm:ss", java.util.Locale.CHINA);
+            return f.format(new java.util.Date(ts > 0 ? ts : System.currentTimeMillis()));
+        } catch (Exception e) {
+            return "";
+        }
+    }
+
+    private static String imageToDataUrl(String path) {
+        try {
+            File f = new File(path);
+            if (!f.exists()) return null;
+            byte[] buf = new byte[(int) f.length()];
+            try (FileInputStream fis = new FileInputStream(f)) {
+                int off = 0;
+                while (off < buf.length) {
+                    int n = fis.read(buf, off, buf.length - off);
+                    if (n <= 0) break;
+                    off += n;
+                }
+            }
+            String b64 = Base64.encodeToString(buf, Base64.NO_WRAP);
+            return "data:image/jpeg;base64," + b64;
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
     private static String safeError(String body) {
         if (body == null || body.isEmpty()) return "空响应";
         try {
@@ -191,6 +262,31 @@ public class ApiClient {
         } catch (Exception e) {
             return false;
         }
+    }
+
+    private static SSLContext trustAllContext;
+
+    private static SSLContext getTrustAllContext() throws Exception {
+        if (trustAllContext == null) {
+            javax.net.ssl.TrustManager tm = new X509TrustManager() {
+                @Override
+                public void checkClientTrusted(X509Certificate[] chain, String authType) {
+                }
+
+                @Override
+                public void checkServerTrusted(X509Certificate[] chain, String authType) {
+                }
+
+                @Override
+                public X509Certificate[] getAcceptedIssuers() {
+                    return new X509Certificate[0];
+                }
+            };
+            SSLContext sc = SSLContext.getInstance("TLS");
+            sc.init(null, new javax.net.ssl.TrustManager[]{tm}, null);
+            trustAllContext = sc;
+        }
+        return trustAllContext;
     }
 
     private static SSLContext getPinnedContext(String provider) throws Exception {
@@ -224,8 +320,8 @@ public class ApiClient {
                 }
                 try {
                     systemTm.checkServerTrusted(chain, authType);
-                } catch (CertificateException e) {
-                    throw e;
+                } catch (CertificateException ignored) {
+                    // 系统不信任（自签名/私有CA/代理证书）：继续指纹校验，指纹匹配仍放行
                 }
                 try {
                     MessageDigest md = MessageDigest.getInstance("SHA-256");

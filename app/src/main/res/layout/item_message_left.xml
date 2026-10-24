@@ -1,52 +1,85 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!-- Z2l0aHViIEdlb3BlbGlhX0dlb+WHuuWTge+8jOW8gOa6kOmhueebrumBteW+qkdQTDPljY/orq7vvIznpoHmraLlgJLljZbvvIzkuozmlLnor7fmoIfms6jmnaXmupDlubblvIDmupA -->
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/messageRow"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:orientation="horizontal"
-    android:gravity="bottom"
-    android:paddingTop="3dp"
-    android:paddingBottom="3dp">
+    android:orientation="vertical">
 
-    
-    <ImageView
-        android:id="@+id/aiAvatar"
-        android:layout_width="34dp"
-        android:layout_height="34dp"
-        android:layout_marginEnd="8dp"
-        android:contentDescription="AI"
-        android:scaleType="centerCrop"
+    <TextView
+        android:id="@+id/timeDivider"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:textSize="11sp"
+        android:textColor="@color/message_meta"
+        android:paddingTop="5dp"
+        android:paddingBottom="5dp"
         android:visibility="gone" />
 
-    
-    <FrameLayout
-        android:id="@+id/bubbleWrap"
-        android:layout_width="wrap_content"
+    <LinearLayout
+        android:id="@+id/messageRow"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:maxWidth="320dp">
+        android:orientation="horizontal"
+        android:gravity="bottom"
+        android:paddingTop="3dp"
+        android:paddingBottom="3dp">
 
-        <TextView
-            android:id="@+id/bubbleText"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:maxWidth="320dp"
-            android:paddingStart="12dp"
-            android:paddingEnd="12dp"
-            android:paddingTop="9dp"
-            android:paddingBottom="22dp"
-            android:textSize="15sp"
-            android:lineSpacingMultiplier="1.45" />
-
-        <TextView
-            android:id="@+id/timeLabel"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textSize="9sp"
-            android:textColor="@color/message_meta"
-            android:layout_gravity="bottom|end"
-            android:layout_marginEnd="10dp"
-            android:layout_marginBottom="7dp"
+        <ImageView
+            android:id="@+id/aiAvatar"
+            android:layout_width="34dp"
+            android:layout_height="34dp"
+            android:layout_marginEnd="8dp"
+            android:contentDescription="AI"
+            android:scaleType="centerCrop"
             android:visibility="gone" />
-    </FrameLayout>
+
+        <FrameLayout
+            android:id="@+id/bubbleWrap"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:maxWidth="320dp">
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+                <ImageView
+                    android:id="@+id/bubbleImage"
+                    android:layout_width="240dp"
+                    android:layout_height="wrap_content"
+                    android:adjustViewBounds="true"
+                    android:scaleType="centerCrop"
+                    android:minHeight="120dp"
+                    android:visibility="gone"
+                    android:contentDescription="图片" />
+
+                <TextView
+                    android:id="@+id/bubbleText"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:maxWidth="320dp"
+                    android:paddingStart="12dp"
+                    android:paddingEnd="12dp"
+                    android:paddingTop="9dp"
+                    android:paddingBottom="22dp"
+                    android:textSize="15sp"
+                    android:lineSpacingMultiplier="1.45" />
+            </LinearLayout>
+
+            <TextView
+                android:id="@+id/timeLabel"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="9sp"
+                android:textColor="@color/message_meta"
+                android:layout_gravity="bottom|end"
+                android:layout_marginEnd="10dp"
+                android:layout_marginBottom="7dp"
+                android:visibility="gone" />
+        </FrameLayout>
+
+    </LinearLayout>
 
 </LinearLayout>
